@@ -1,0 +1,22 @@
+mfdfa
+Copyright (c) 2026 Matthew Busel. Licensed under the MIT License (see LICENSE).
+
+This crate was carved out of srfm-lab (https://github.com/Mattbusel/srfm-lab,
+MIT License, Copyright (c) 2026 Matthew Busel), at commit
+8cbfcb0551d44e3ed1c20bdae9dc805d61521c62 (2026-11-07), from these files:
+
+  crates/fractal-engine/src/multifractal.rs       MultifractalAnalyzer (now a wrapper over mfdfa())
+  crates/fractal-engine/src/fractal_dimension.rs  Higuchi, box counting, FdClass
+  crates/fractal-engine/src/fractal_dim_ext.rs    Petrosian, Katz, FractalDimension dispatcher
+  crates/fractal-engine/src/hurst.rs              rescaled-range Hurst, HurstRegime
+  crates/fractal-engine/src/wavelet.rs            db4 DWT (filters realigned, inverse rewritten)
+  crates/fractal-engine/src/detrending.rs         HP, Baxter-King, SSA, EMD detrending
+  crates/fractal-engine/tests/fractal_tests.rs    now tests/legacy_modules.rs
+  lib/math/fractal.py                             mfdfa(), higuchi_fd(), hurst_dfa() (Python reference)
+
+Left behind: main.rs, pattern_library.rs, similarity.rs, regime_detector.rs.
+What changed on the way out is listed in docs/PROVENANCE.md.
+
+The reference values in tests/reference_data.rs are produced by running the
+MFDFA (BSD-3-Clause), antropy (BSD-3-Clause) and PyWavelets (MIT) Python
+packages; no code from those packages is included.

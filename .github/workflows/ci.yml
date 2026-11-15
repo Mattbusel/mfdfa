@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test --no-default-features
+      - run: cargo test --all-features
+      - run: cargo run --example spectrum
+      - run: cargo run --example streaming --features ta
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - run: cargo fmt --check
+      - run: cargo clippy --all-features --all-targets -- -D warnings
+      - run: cargo doc --all-features --no-deps
+        env:
+          RUSTDOCFLAGS: -D warnings
+
+  msrv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Resolve dependencies compatible with rust-version
+        run: cargo generate-lockfile
+        env:
+          CARGO_RESOLVER_INCOMPATIBLE_RUST_VERSIONS: fallback
+      - uses: dtolnay/rust-toolchain@1.81.0
+      - run: cargo +1.81.0 test --all-features
+
+  reference:
+    name: regenerate Python reference values
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r tools/requirements.txt
+      - name: Reference values are reproducible
+        run: |
+          python tools/gen_reference.py > /tmp/reference_data.rs
+          python - <<'EOF'
+          import re
+          def nums(p):
+              s = open(p).read()
+              s = "\n".join(l for l in s.splitlines() if not l.startswith("//"))
+              return [float(x) for x in re.findall(r"-?\d+\.\d+(?:e-?\d+)?", s)]
+          a, b = nums("tests/reference_data.rs"), nums("/tmp/reference_data.rs")
+          assert len(a) == len(b), (len(a), len(b))
+          worst = max(abs(x - y) / max(abs(x), 1.0) for x, y in zip(a, b))
+          print("max relative difference:", worst)
+          assert worst < 1e-11
+          EOF

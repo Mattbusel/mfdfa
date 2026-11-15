@@ -1,0 +1,54 @@
+[package]
+name = "mfdfa"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.81"
+authors = ["Matthew Busel"]
+license = "MIT"
+description = "Multifractal detrended fluctuation analysis (MFDFA spectra h(q), tau(q), f(alpha)), Higuchi fractal dimension and wavelet Hurst estimation for time series. Carved out of srfm-lab."
+repository = "https://github.com/Mattbusel/mfdfa"
+homepage = "https://github.com/Mattbusel/mfdfa"
+documentation = "https://docs.rs/mfdfa"
+readme = "docs/CRATE.md"
+keywords = ["mfdfa", "multifractal", "hurst", "fractal-dimension", "time-series"]
+categories = ["mathematics", "science", "algorithms"]
+exclude = ["/tools", "/.github"]
+
+[features]
+default = []
+# Streaming indicators implement ta::Next<f64>, ta::Next<&T: Close>, ta::Reset and ta::Period.
+ta = ["dep:ta"]
+# Serialize/Deserialize derives on result types.
+serde = ["dep:serde"]
+# Exact fractional Gaussian noise synthesis (Davies-Harte, FFT based).
+synth = ["dep:rustfft"]
+# The `mfdfa` command line tool.
+cli = ["dep:clap", "dep:csv"]
+
+[dependencies]
+ta = { version = "0.5", optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
+rustfft = { version = "6", optional = true }
+clap = { version = "4", features = ["derive"], optional = true }
+csv = { version = "1", optional = true }
+
+[dev-dependencies]
+approx = "0.5"
+
+[[bin]]
+name = "mfdfa"
+path = "src/bin/mfdfa.rs"
+required-features = ["cli"]
+
+[[example]]
+name = "spectrum"
+path = "examples/spectrum.rs"
+
+[[example]]
+name = "streaming"
+path = "examples/streaming.rs"
+required-features = ["ta"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
