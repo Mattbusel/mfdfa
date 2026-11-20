@@ -1,9 +1,27 @@
-# mfdfa
+# mfdfa: one Hurst exponent hides the risk you care about
 
 [![crates.io](https://img.shields.io/crates/v/mfdfa.svg)](https://crates.io/crates/mfdfa)
 [![docs.rs](https://docs.rs/mfdfa/badge.svg)](https://docs.rs/mfdfa)
 
-Multifractal detrended fluctuation analysis for Rust. It measures how the scaling of a time series changes with the size of its moves. You get the full MFDFA spectrum (`h(q)`, `tau(q)`, `f(alpha)`), the ordinary DFA Hurst exponent, the Higuchi fractal dimension and a wavelet Hurst estimate. There are no required dependencies. Results are checked against independent Python packages.
+A single Hurst exponent tells you whether a series trends or mean-reverts on average. It does not tell you whether the big moves scale like the small ones, and in markets that is the part that hurts. Two return series can have the same Hurst exponent and completely different tails:
+
+```sh
+cargo run --example same_hurst
+```
+```text
+plain noise         Hurst h(2) = 0.49   spectrum width = 0.10
+cascade volatility  Hurst h(2) = 0.47   spectrum width = 0.74
+```
+
+Multifractal detrended fluctuation analysis (Kantelhardt et al. 2002) measures exactly that difference: a generalised Hurst exponent `h(q)` for every moment `q`, and the singularity spectrum `f(alpha)` whose width is near 0 for a monofractal series and grows with intermittency. If your regime or risk model stops at one Hurst number, it is reporting the average and dropping the tails.
+
+**Why this instead of the alternatives.** In Python, MFDFA, Higuchi and wavelet Hurst usually come from three different packages. mfdfa gives you all of them in one crate with no required dependencies, and the tests compare it with the independent Python packages (`MFDFA` 0.4.3 for `F_q(s)`, `antropy` 0.2.3 for Higuchi, PyWavelets for the db4 filters), not with its own output. Errors are values: short input, bad scales or NaN return an `Error` that says which, never a panic and never a quiet NaN spectrum.
+
+**Why today.** `cargo add mfdfa`, no build scripts, no BLAS. The `ta` feature gives rolling Hurst and Higuchi as `ta::Next` indicators, one bar at a time, and the `cli` feature reads a CSV of prices.
+
+**Who it is for:** quants and researchers who classify regimes or size risk from scaling behaviour, and anyone porting a Python fractal-analysis notebook to Rust who needs the same numbers.
+
+**Trade-offs, on purpose:** `f64` slices in, plain structs out; no plotting; polynomial detrending of order you choose, nothing adaptive behind your back.
 
 ## Install
 

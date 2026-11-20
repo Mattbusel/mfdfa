@@ -1,13 +1,12 @@
 [package]
 name = "mfdfa"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 rust-version = "1.81"
 authors = ["Matthew Busel"]
 license = "MIT"
-description = "Multifractal detrended fluctuation analysis (MFDFA spectra h(q), tau(q), f(alpha)), Higuchi fractal dimension and wavelet Hurst estimation for time series. Carved out of srfm-lab."
+description = "One Hurst exponent hides the risk you care about. Multifractal DFA (h(q), tau(q), f(alpha)), Higuchi fractal dimension and wavelet Hurst for time series, checked against the independent Python packages. No required dependencies; ta::Next rolling estimators."
 repository = "https://github.com/Mattbusel/mfdfa"
-homepage = "https://github.com/Mattbusel/mfdfa"
 documentation = "https://docs.rs/mfdfa"
 readme = "docs/CRATE.md"
 keywords = ["mfdfa", "multifractal", "hurst", "fractal-dimension", "time-series"]
@@ -43,6 +42,10 @@ required-features = ["cli"]
 [[example]]
 name = "spectrum"
 path = "examples/spectrum.rs"
+
+[[example]]
+name = "same_hurst"
+path = "examples/same_hurst.rs"
 
 [[example]]
 name = "streaming"

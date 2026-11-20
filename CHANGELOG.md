@@ -4,6 +4,17 @@ All notable changes to this crate are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the crate uses
 [semantic versioning](https://semver.org/).
 
+## [0.1.1] - 2026-11-20
+
+### Added
+- `examples/same_hurst.rs`: two return series with the same DFA Hurst exponent
+  (0.49 and 0.47) and spectrum widths of 0.10 and 0.74.
+
+### Changed
+- README opens with the stance (one Hurst exponent hides the tails), why this
+  crate, why today, who it is for and the trade-offs; Cargo description matches.
+  No library code change.
+
 ## [0.1.0] - 2026-11-15
 
 First release, carved out of the `fractal-engine` crate and `lib/math/fractal.py`
